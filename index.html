@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+		.happy
+		{
+			background: url("smilies.png") 0px 0px;
+			width: 60px;
+			height: 65px;
+		}
+		.reallyhappy
+		{
+			background: url("smilies.png") -60px 0px;
+			width: 60px;
+			height: 65px;
+		}
+		.neutral
+		{
+			background: url("smilies.png") -120px 0px;
+			width: 60px;
+			height: 65px
+		}
+		.sad
+		{
+			background: url("smilies.png") -180px 0px;
+			width: 60px;
+			height: 65px;
+		}
+		.reallysad
+		{
+			background: url('smilies.png') -240px 0px;
+			width: 60px;
+			height: 65px;
+		}
+		.face
+		{
+			float: left;
+			margin-right: 20px;
+		}
+		li
+		{
+			margin-bottom: 35px;
+			font-size: 25px;
+			list-style: none;
+			clear: left;
+			/*display: none;*/
+		}
+		input
+		{
+			font-size: 25px;
+			width: 340px;
+		}
+		button
+		{
+			font-size: 20px;
+			width: 50px;
+			height: 36px;
+			padding-top: 5px;
+		}
+		.result
+		{
+			width: 700px;
+			margin-top: 0;
+			position: absolute;
+			left: 500px;
+		}
+		#form
+		{
+			float: left;
+			width: 400px;
+			margin-left: 50px;
+			margin-top: 80px;
+		}
+		.imgresult
+		{
+			width: 258px;
+			margin: 20px 0 0 70px;
+		}
+		.loading
+		{
+			background: url("gallery_loader.gif") center;
+			width: 508px;
+			height: 324px;
+		}
+		p
+		{
+			text-align:right;
+			color:#808080;
+		}
+		a:hover
+		{
+			text-decoration:underline;
+		}
+		a
+		{
+			text-decoration:none;
+			font-weight:bold;
+			color:black;
+		}
+		</style>
+	</head>
+<body>
+
+<div id="content">
+	<div id="form">
+		<img src="how.png">
+		<input type="text" id="input">
+		<button id="button">Go</button>
+		<div class="average"></div>
+		<p>Built by <a href="http://twitter.com/tobiaswright">@tobiaswright</a> and <a href="http://twitter.com/jorenerene">@jorenerene</a></p>
+		<p>powered by <a href="http://metalayer.com">metaLayer</a> and <a href="http://twitter.com">Twitter</a></p>
+	</div>
+	<ul class="result"></ul>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script>
+
+var sentiment = function ( textinput ) {
+
+	$.ajax({
+		url: "metalayer.php",
+		dataType: 'json',
+		data: { txt : {text : textinput} },
+		success: function(data) {
+			//console.log(data)
+			var sentiment = data.response.datalayer.sentiment;
+			var themood = mood(sentiment);
+			var average = moodAverage(sentiment)
+
+			var statement = "<li>";
+				statement += "<div class='face " + themood + "'></div>";
+				statement += textinput;
+				statement += "...";
+				statement += "</li>";
+
+			$(".result").prepend(statement);
+			//console.log(statement)
+
+			/*setTimeout (function () {
+				$(".result").removeClass("loading");
+				$(".result li").fadeIn(1000);	
+			}, 300);*/
+	  },
+		error: function (xhr, ajaxOptions, thrownError) {
+			console.log(xhr.status);
+			console.log(thrownError);
+	  }
+	});
+
+}
+
+var gettwitter = function (query) {
+
+	var nykey = "http://search.twitter.com/search.json?q=" + query + "&callback=?";
+
+	$.ajax({
+		url: nykey,
+		dataType: 'json',
+		success: function(data) {
+			$.each(data.results, function(i){
+				sentiment(data.results[i].text);
+			});
+		},
+		error: function (xhr, ajaxOptions, thrownError) {
+			console.log(xhr.status);
+			console.log(thrownError);
+		}	
+	});
+
+}
+
+
+var mood = function (sentiment) {
+	var mood;
+
+	if (sentiment > 0.3) mood = "reallyhappy";
+	else if (sentiment > 0.1) mood = "happy";
+	else if (sentiment > -0.1) mood = "neutral";
+	else if (sentiment < -0.3 ) mood = "reallysad";
+	else if (sentiment < -0.1) mood = "sad";
+	
+	return mood
+}
+
+var moodAverage = function( sentiment ) {
+	var average = 0,
+		average_num = 0,
+		average_sum = 0;
+
+	average_num++;
+	average_sum += sentiment;
+	average = average_sum / average_num;
+
+	return average;
+}
+
+gettwitter("secret rewards");
+
+
+</script>
+
+
+</body>
+</html>
