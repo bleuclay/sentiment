@@ -25,7 +25,7 @@ var sentiment = function ( textinput ) {
 	$.ajax({
 		url: "process.php",
 		dataType: 'json',
-		data: { txt : {text : textinput} },
+		data: { txt : {text : textinput}, service : "metalayer" },
 		success: function(data) {
 			//console.log(data)
 			var sentiment = data.response.datalayer.sentiment;
@@ -55,16 +55,15 @@ var sentiment = function ( textinput ) {
 }
 
 var gettwitter = function (query) {
-
-	var nykey = "http://search.twitter.com/search.json?q=" + query + "&callback=?";
-
 	$.ajax({
-		url: nykey,
+		url: "process.php",
 		dataType: 'json',
+		data: { service : "twitter", queryprocess : query },
 		success: function(data) {
-			$.each(data.results, function(i){
-				sentiment(data.results[i].text);
-				console.log(i)
+			//console.log(data)
+			$.each(data.statuses, function(i){
+				sentiment(data.statuses[i].text);
+				//console.log(i)
 			});
 		},
 		error: function (xhr, ajaxOptions, thrownError) {
@@ -82,8 +81,9 @@ var mood = function (sentiment) {
 	if (sentiment > 0.3) mood = "reallyhappy";
 	else if (sentiment > 0.1) mood = "happy";
 	else if (sentiment > -0.1) mood = "neutral";
-	else if (sentiment < -0.3 ) mood = "reallysad";
 	else if (sentiment < -0.1) mood = "sad";
+	else if (sentiment < -0.3 ) mood = "reallysad";
+	
 	
 	return mood
 }
