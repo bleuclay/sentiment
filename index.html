@@ -8,8 +8,12 @@
 <div id="content">
 	<div id="form">
 		<h1>Sentiment checker</h1>
-		<input type="text" id="input">
-		<button id="button">Go</button>
+
+		<form>
+			<input type="text" id="input">
+			<button type="submit" id="button">Go</button>
+		</form>
+
 		<div class="average"></div>
 		<p>Built by <a href="http://twitter.com/tobiaswright">@tobiaswright</a> and <a href="http://twitter.com/jorenerene">@jorenerene</a></p>
 		<p>powered by <a href="http://metalayer.com">metaLayer</a> and <a href="http://twitter.com">Twitter</a></p>
@@ -20,6 +24,10 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script>
 
+	var average=0;
+	var average_num = 0,
+		average_sum = 0;
+
 var sentiment = function ( textinput ) {
 
 	$.ajax({
@@ -27,10 +35,12 @@ var sentiment = function ( textinput ) {
 		dataType: 'json',
 		data: { txt : {text : textinput}, service : "metalayer" },
 		success: function(data) {
-			//console.log(data)
-			var sentiment = data.response.datalayer.sentiment;
-			var themood = mood(sentiment);
-			var average = moodAverage(sentiment)
+			var sentiment = data.response.datalayer.sentiment,
+				themood = mood(sentiment);
+
+				average_num++;
+				average_sum += sentiment;
+				average = average_sum / average_num;
 
 			var statement = "<li>";
 				statement += "<div class='face " + themood + "'></div>";
@@ -39,32 +49,29 @@ var sentiment = function ( textinput ) {
 				statement += "</li>";
 
 			$(".result").prepend(statement);
-			//console.log(statement)
-
-			/*setTimeout (function () {
-				$(".result").removeClass("loading");
-				$(".result li").fadeIn(1000);	
-			}, 300);*/
-	  },
+		},
 		error: function (xhr, ajaxOptions, thrownError) {
 			console.log(xhr.status);
 			console.log(thrownError);
-	  }
+		}
 	});
+
 
 }
 
 var gettwitter = function (query) {
+	$(".result").empty();
+
 	$.ajax({
 		url: "process.php",
 		dataType: 'json',
 		data: { service : "twitter", queryprocess : query },
 		success: function(data) {
-			//console.log(data)
 			$.each(data.statuses, function(i){
 				sentiment(data.statuses[i].text);
-				//console.log(i)
 			});
+
+			console.log(average)
 		},
 		error: function (xhr, ajaxOptions, thrownError) {
 			console.log(xhr.status);
@@ -72,20 +79,20 @@ var gettwitter = function (query) {
 		}	
 	});
 
+	
 }
 
 
 var mood = function (sentiment) {
 	var mood;
 
-	if (sentiment > 0.3) mood = "reallyhappy";
+	if (sentiment > 0.4) mood = "reallyhappy";
 	else if (sentiment > 0.1) mood = "happy";
 	else if (sentiment > -0.1) mood = "neutral";
 	else if (sentiment < -0.1) mood = "sad";
-	else if (sentiment < -0.3 ) mood = "reallysad";
-	
-	
-	return mood
+	else if (sentiment < -0.4 ) mood = "reallysad";
+
+	return mood;
 }
 
 var moodAverage = function( sentiment ) {
@@ -100,8 +107,12 @@ var moodAverage = function( sentiment ) {
 	return average;
 }
 
-gettwitter("secret rewards");
 
+
+$("form").submit( function() {
+	gettwitter($("#input").val());
+	return false;
+});
 
 </script>
 
