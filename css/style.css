@@ -1,67 +1,56 @@
-.happy
-{
+.happy {
 	background: url("../img/smilies.png") 0px 0px;
 	width: 60px;
 	height: 65px;
 }
-.reallyhappy
-{
+.reallyhappy {
 	background: url("../img/smilies.png") -60px 0px;
 	width: 60px;
 	height: 65px;
 }
-.neutral
-{
+.neutral {
 	background: url("../img/smilies.png") -120px 0px;
 	width: 60px;
 	height: 65px
 }
-.sad
-{
+.sad {
 	background: url("../img/smilies.png") -180px 0px;
 	width: 60px;
 	height: 65px;
 }
-.reallysad
-{
+.reallysad {
 	background: url('../img/smilies.png') -240px 0px;
 	width: 60px;
 	height: 65px;
 }
-.face
-{
+.face {
 	float: left;
 	margin-right: 20px;
 }
-li
-{
-	margin-bottom: 35px;
+li {
+	margin-bottom: 55px;
 	font-size: 25px;
 	list-style: none;
 	clear: left;
 	/*display: none;*/
 }
-input
-{
+input {
 	font-size: 25px;
 	width: 340px;
 }
-button
-{
+button {
 	font-size: 20px;
 	width: 50px;
 	height: 36px;
 	padding-top: 5px;
 }
-.result
-{
+.result {
 	width: 700px;
 	margin-top: 0;
 	position: absolute;
 	left: 500px;
 }
-#form
-{
+#form {
 	float: left;
 	width: 400px;
 	margin-left: 50px;
@@ -72,24 +61,28 @@ button
 	width: 258px;
 	margin: 20px 0 0 70px;
 }
-.loading
-{
+.loading {
 	background: url("../img/gallery_loader.gif") center;
 	width: 508px;
 	height: 324px;
 }
-p
-{
-	text-align:right;
+li p {
 	color:#808080;
+	margin-left: 80px;
 }
-a:hover
-{
+a:hover {
 	text-decoration:underline;
 }
-a
-{
+a {
 	text-decoration:none;
 	font-weight:bold;
 	color:black;
+}
+li img {
+	float: left;
+	width: 30px;
+	margin-right: 5px;
+}
+li span {
+	font-size: 15px;
 }

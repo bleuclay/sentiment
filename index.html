@@ -7,7 +7,7 @@
 
 <div id="content">
 	<div id="form">
-		<h1>Sentiment checker</h1>
+		<img src="img/how.png">
 
 		<form>
 			<input type="text" id="input">
@@ -24,19 +24,18 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script>
 
-	var average=0;
-	var average_num = 0,
-		average_sum = 0;
+var average;
 
-var sentiment = function ( textinput ) {
-
+var sentiment = function ( tweets, total, count ) {
 	$.ajax({
 		url: "process.php",
 		dataType: 'json',
-		data: { txt : {text : textinput}, service : "metalayer" },
+		data: { txt : {text : tweets.text}, service : "metalayer" },
 		success: function(data) {
 			var sentiment = data.response.datalayer.sentiment,
-				themood = mood(sentiment);
+				themood = mood(sentiment),
+				average_num = 0,
+				average_sum = 0;
 
 				average_num++;
 				average_sum += sentiment;
@@ -44,43 +43,52 @@ var sentiment = function ( textinput ) {
 
 			var statement = "<li>";
 				statement += "<div class='face " + themood + "'></div>";
-				statement += textinput;
-				statement += "...";
+				statement += "<p><img src='"+tweets.user.profile_image_url+"'>";
+				statement += tweets.text;
+				statement += "<br><span><a href='http://www.twitter.com/"+tweets.user.screen_name+"'>@"+tweets.user.screen_name+"</a></span>";
+				statement += " | <span>MetaLayer setiment score:"+sentiment+"</span>";
+				statement += "</p>";
 				statement += "</li>";
 
 			$(".result").prepend(statement);
+
+			if (total === count+1) {
+				averageimage = mood(average)
+				var finalaverage = "<img style='margin:0 72px auto;width:250px' src='img/"+averageimage+".png'>";
+				$(".average").prepend(finalaverage);
+			}
+
 		},
 		error: function (xhr, ajaxOptions, thrownError) {
 			console.log(xhr.status);
 			console.log(thrownError);
 		}
 	});
-
-
 }
 
 var gettwitter = function (query) {
-	$(".result").empty();
+	var numoftweets;
 
+	$(".result, .average").empty();
 	$.ajax({
 		url: "process.php",
 		dataType: 'json',
 		data: { service : "twitter", queryprocess : query },
 		success: function(data) {
+			console.log(data)
+			numoftweets = data.statuses.length;
+		
 			$.each(data.statuses, function(i){
-				sentiment(data.statuses[i].text);
-			});
-
-			console.log(average)
+				sentiment(data.statuses[i], numoftweets, i);
+			});			
 		},
 		error: function (xhr, ajaxOptions, thrownError) {
 			console.log(xhr.status);
 			console.log(thrownError);
-		}	
+		}
 	});
-
-	
 }
+
 
 
 var mood = function (sentiment) {
@@ -94,20 +102,6 @@ var mood = function (sentiment) {
 
 	return mood;
 }
-
-var moodAverage = function( sentiment ) {
-	var average = 0,
-		average_num = 0,
-		average_sum = 0;
-
-	average_num++;
-	average_sum += sentiment;
-	average = average_sum / average_num;
-
-	return average;
-}
-
-
 
 $("form").submit( function() {
 	gettwitter($("#input").val());
